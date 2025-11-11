@@ -40,20 +40,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve frontend static files (so the same server can serve index.html and accept POSTs)
-static_dir = Path(__file__).resolve().parent.parent / "english_exam_content"
-if static_dir.exists():
-    # Serve static files under /static to avoid catching POSTs to application routes
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
-    # Serve index.html at root explicitly so routes like POST /submit_exam remain handled by FastAPI
-    from fastapi.responses import FileResponse
-
-    @app.get("/", response_class=HTMLResponse)
-    async def serve_index():
-        return FileResponse(static_dir / "index.html")
-else:
-    print(f"Warning: static directory not found at {static_dir}; frontend won't be served by backend.")
 
 # We're running in HF-only mode per user request: do not initialize or use OpenAI client.
 # Keep the OPENAI_API_KEY variable in case users add it later, but we won't use it here.
